@@ -87,14 +87,14 @@ fileOutput =  open('res.txt', "w")
 
 checkBoxSet()
 
-var = ""
+var = "SystemsAnalysisWorkflows="
 for i in range(len(selected)):
     var+=selected[i]
 print(var)
 
 for line in fileInput:
-    fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio"))
-    fileOutput.write(line.replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, ABDistribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\ABViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, ABProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw","SystemsAnalysisWorkflows="+var))
+    fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
+    #fileOutput.write(line.replace("OpenStudio=%","OpenStudio=C:\\ProgramData\ABBem\OStudio"))
 fileInput.close()
 fileOutput.close()
 os.remove(path)
