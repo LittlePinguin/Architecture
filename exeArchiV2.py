@@ -3,6 +3,9 @@ import os
 import shutil
 from zipfile import ZipFile
 from tkinter import *
+import subprocess
+import time
+import getpass
 
 # interface checkbox
 window = Tk()
@@ -12,7 +15,7 @@ services = []
 files = ["BuildingEnergySimulation=C:\\ProgramData\ABBEM\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, ",
          "AB Besoins Bioclimatiques=C:\\ProgramData\ABBEM\AB Besoins Bioclimatiques.osw, ",
          "AB Distribution Besoins=C:\\ProgramData\ABBEM\AB Distribution Besoins.osw, ",
-         " AB ViewData=C:\\ProgramData\ABBEM\ABViewData.osw, ",
+         "AB ViewData=C:\\ProgramData\ABBEM\ABViewData.osw, ",
          "AB EnergyPlus=C:\\ProgramData\ABBEM\AB EnergyPlus.osw, ",
          "AB Bem=C:\\ProgramData\ABBEM\AB Bem.osw, ",
          "AB ProfilsHoraires=C:\\ProgramData\ABBEM\AB ProfilsHoraires.osw, ",
@@ -72,18 +75,22 @@ def checkBoxSet():
 def find(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
-            return os.path.join(root,name)
+            return root
 
 
-# main
+# ######## main ########
 # move dirs
-#shutil.move('C:\\Downloads','C:\\ProgramData\ABBEM')
+src = os.path.join('C:\\', 'Users',getpass.getuser(),'Downloads','DirTest')
+dest = os.path.join('C:\\', 'ProgramData', 'ABBEM') # To complete when have full path to avoid time cost
+
+os.mkdir(dest)
+
+shutil.move(src, dest)
 
 # read and write file
-path = find('test.txt', 'C:\\Users\AMANI\Documents\Work\ExecArchitecture')
-print(path)
-fileInput = open(path, "r")
-fileOutput =  open('res.txt', "w")
+path = find('Revit.ini', dest)
+fileInput = open(os.path.join(path,'Revit.ini'), "r", encoding="utf-16")
+fileOutput =  open(os.path.join(path,'res.ini'), "w", encoding="utf-16")
 
 checkBoxSet()
 
@@ -94,8 +101,7 @@ print(var)
 
 for line in fileInput:
     fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
-    #fileOutput.write(line.replace("OpenStudio=%","OpenStudio=C:\\ProgramData\ABBem\OStudio"))
 fileInput.close()
 fileOutput.close()
-os.remove(path)
-os.rename(find('res.txt', 'C:\\Users\AMANI\Documents\Work\ExecArchitecture'), path)
+os.remove(os.path.join(path,'Revit.ini'))
+os.rename(os.path.join(path,'res.ini'), os.path.join(path,'Revit.ini'))
