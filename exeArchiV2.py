@@ -81,11 +81,13 @@ def find(name, path):
 # ######## main ########
 # move dirs
 src = os.path.join('C:\\', 'Users',getpass.getuser(),'Downloads','DirTest')
+src2 = os.path.join('C:\\', 'Users',getpass.getuser(),'Downloads','OStudio')
 dest = os.path.join('C:\\', 'ProgramData', 'ABBEM') # To complete when have full path to avoid time cost
 
 os.mkdir(dest)
 
 shutil.move(src, dest)
+shutil.move(src2, dest)
 
 # read and write file
 path = find('Revit.ini', dest)
