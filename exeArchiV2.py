@@ -50,7 +50,6 @@ def getInfo(selected):
         selected += files[7]
     selected.pop()
     selected.pop()
-    print(selected)
 
 def closeWindow():
     getInfo(selected)
@@ -79,21 +78,26 @@ def find(name, path):
 
 
 # ######## main ########
-# move dirs
-src = os.path.join('C:\\', 'Users',getpass.getuser(),'Downloads','DirTest')
+# move folders
+src = os.path.join('C:\\', 'Users',getpass.getuser(),'Downloads','ABBEM')
 src2 = os.path.join('C:\\', 'Users',getpass.getuser(),'Downloads','OStudio')
 dest = os.path.join('C:\\', 'ProgramData', 'ABBEM') # To complete when have full path to avoid time cost
+fileR = 'Revit.ini'
+filer = 'res.ini'
 
+print("Creating folder ABBEM...")
 os.mkdir(dest)
 
+print("Moving ABBEM and OStudio to ABBEM...")
 shutil.move(src, dest)
 shutil.move(src2, dest)
 
 # read and write file
-path = find('Revit.ini', dest)
-fileInput = open(os.path.join(path,'Revit.ini'), "r", encoding="utf-16")
-fileOutput =  open(os.path.join(path,'res.ini'), "w", encoding="utf-16")
+path = find(fileR, dest)
+fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
+fileOutput =  open(os.path.join(path, filer), "w", encoding="utf-16")
 
+print("Getting files to install...")
 checkBoxSet()
 
 var = "SystemsAnalysisWorkflows="
@@ -101,9 +105,12 @@ for i in range(len(selected)):
     var+=selected[i]
 print(var)
 
+print("Modifying Revit.ini...")
 for line in fileInput:
     fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
+
 fileInput.close()
 fileOutput.close()
-os.remove(os.path.join(path,'Revit.ini'))
-os.rename(os.path.join(path,'res.ini'), os.path.join(path,'Revit.ini'))
+os.remove(os.path.join(path, fileR))
+os.rename(os.path.join(path, filer), os.path.join(path, fileR))
+print("Program ending.")
