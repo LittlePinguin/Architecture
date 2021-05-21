@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter.ttk import Progressbar
 import time
 import os
+import sys
 import shutil
 import getpass
 import fileinput
@@ -246,15 +247,17 @@ def popUpWindow():
     print("CURRENT PATH : " + os.path.join(currentPath, 'ABBEM'))
 
     # Create new directory 'ABBem' in 'ProgramData'
-    if ( abbemPath != 'notFound'):
+    if (abbemPath != 'notFound'):
+        os.chmod(abbemPath, os.stat.S_IWRITE)
         shutil.rmtree(abbemPath)
     os.mkdir(dest)
 
-
     # Create new directory 'ABBem' in 'Documents'
-    os.mkdir(docPath)
+    if (docPath == 'notFound'):
+        os.mkdir(docPath)
 
     # Moove files and dirs in new directory
+    # TODO : change 'src' by 'currentPath'
     shutil.move(currentPath, dest)
 
     # TODO : change for 'if files mooved'
