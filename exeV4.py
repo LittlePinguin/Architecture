@@ -255,8 +255,7 @@ def popUpWindow():
     os.mkdir(docPath)
 
     # Moove files and dirs in new directory
-    # TODO : change 'src' by 'currentPath'
-    shutil.move(src, dest)
+    shutil.move(currentPath, dest)
 
     # TODO : change for 'if files mooved'
     popUp.after(2000, lambda: (filesFrame(), popUp.destroy()))
