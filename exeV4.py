@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter.ttk import Progressbar
 import time
 import os
+import stat
 import sys
 import shutil
 import getpass
@@ -46,6 +47,7 @@ l5.place(x=50, y=180)
 
 
 # Variables
+fileR = 'Revit.ini'
 selected =[]
 choice = IntVar()
 a = IntVar()
@@ -56,14 +58,14 @@ e = IntVar()
 f = IntVar()
 g = IntVar()
 h = IntVar()
-files = ["BuildingEnergySimulation=C:\\ProgramData\ABBEM\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, ",
-         "AB Besoins Bioclimatiques=C:\\ProgramData\ABBEM\AB Besoins Bioclimatiques.osw, ",
-         "AB Distribution Besoins=C:\\ProgramData\ABBEM\AB Distribution Besoins.osw, ",
-         "AB ViewData=C:\\ProgramData\ABBEM\ABViewData.osw, ",
-         "AB EnergyPlus=C:\\ProgramData\ABBEM\AB EnergyPlus.osw, ",
-         "AB Bem=C:\\ProgramData\ABBEM\AB Bem.osw, ",
-         "AB ProfilsHoraires=C:\\ProgramData\ABBEM\AB ProfilsHoraires.osw, ",
-         "AB Test=C:\\ProgramData\ABBEM\AB Test.osw, "]
+#files = ["BuildingEnergySimulation=C:\\ProgramData\ABBEM\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, ",
+#         "AB Besoins Bioclimatiques=C:\\ProgramData\ABBEM\AB Besoins Bioclimatiques.osw, ",
+ #        "AB Distribution Besoins=C:\\ProgramData\ABBEM\AB Distribution Besoins.osw, ",
+  #       "AB ViewData=C:\\ProgramData\ABBEM\ABViewData.osw, ",
+   #      "AB EnergyPlus=C:\\ProgramData\ABBEM\AB EnergyPlus.osw, ",
+    #     "AB Bem=C:\\ProgramData\ABBEM\AB Bem.osw, ",
+     #    "AB ProfilsHoraires=C:\\ProgramData\ABBEM\AB ProfilsHoraires.osw, ",
+      #   "AB Test=C:\\ProgramData\ABBEM\AB Test.osw, "]
 
 
 # Get user name
@@ -74,9 +76,77 @@ src = os.path.join('C:\\', 'Users', getpass.getuser(), 'Downloads','ABBEM')
 dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
 destCheck = os.path.join('C:\\', 'ProgramData')
 revitPath = os.path.join('C:\\', 'Users', getpass.getuser(), 'AppData', 'Roaming', 'Autodesk', 'Revit')
+pathRtmp = os.path.join('C:\\', 'Users', getpass.getuser(), 'Documents', 'Work')
 # See if have to add 'Autodesk Revit 2021' if too slow
 
 
+
+# Find a file or a directory
+def find(name, path, num):
+    if num==2:
+        for root, dirs, files in os.walk(path):
+            if name in files:
+                return root
+    else:
+        for root, dirs, files in os.walk(path):
+            if name in dirs:
+                return root
+    return 'notFound'
+
+
+# Read Revit.ini and copy lines
+def getFiles():
+    path = find(fileR, pathRtmp, 2)
+
+    fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
+
+    for line in fileInput:
+            if (line.startswith("SystemsAnalysisWorkflows")):
+                files = line
+    fileInput.close()
+    files = files.replace("SystemsAnalysisWorkflows=", '', 1)
+    files = files.replace("\n", '')
+    files = files.split(', ')
+    return files
+
+def getLines():
+
+    path = find(fileR, pathRtmp, 2)
+
+    sysLin = ""
+
+    fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
+    for line in fileInput:
+        if (line.startswith("SystemsAnalysisWorkflows")):
+                sysLin = line
+                sysLin = sysLin.replace("\n", "")
+                print(sysLin)
+        if (line.startswith("OpenStudio")):
+            openLine = line
+            openLine = openLine.replace("\n", "")
+            print(openLine)
+    return sysLin
+
+def getLinesO():
+
+    path = find(fileR, pathRtmp, 2)
+
+    openLi = ""
+
+    fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
+    for line in fileInput:
+        if (line.startswith("OpenStudio")):
+            openLi = line
+            openLi = openLi.replace("\n", "")
+            print(openLi)
+    return openLi
+
+sysLine = getLines()
+openLine = getLinesO()
+
+
+files = getFiles()
+openLine2 ="OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021" 
 # Get files selected in filesFrame
 def getInfo(selected):
     if (a.get() == 1):
@@ -95,22 +165,7 @@ def getInfo(selected):
         selected += files[6]
     if (h.get() == 1):
         selected += files[7]
-    if (len(selected)>0):
-        selected.pop()
-        selected.pop()
 
-
-# Find a file or a directory
-def find(name, path, num):
-    if num==2:
-        for root, dirs, files in os.walk(path):
-            if name in files:
-                return root
-    else:
-        for root, dirs, files in os.walk(path):
-            if name in dirs:
-                return root
-    return 'notFound'
 
 abbemPath = find('ABBem', destCheck, 1)
 
@@ -126,7 +181,6 @@ def changeRevit():
     # Get user selection
     getInfo(selected)
 
-    fileR = 'Revit.ini'
     filer = 'res.ini'
 
     # Check if user selected files
@@ -165,7 +219,7 @@ def changeRevit():
     
         # Get 'Revit.ini' path
         # TODO : real 'Revit.ini' path = revitPath
-        path = find(fileR, dest, 2)
+        path = find(fileR, pathRtmp, 2)
 
         # Open files to read and write
         fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
@@ -180,7 +234,8 @@ def changeRevit():
         # Rewrite file 'Revit.ini'
         # TODO : automatize
         for line in fileInput:
-            fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
+            fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw", var))
+        #fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
 
         # Close files
         fileInput.close()
@@ -244,11 +299,10 @@ def popUpWindow():
     docPath = os.path.join('Documents', 'ABBem')
     
     currentPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ABBem')
-    print("CURRENT PATH : " + os.path.join(currentPath, 'ABBEM'))
 
     # Create new directory 'ABBem' in 'ProgramData'
     if (abbemPath != 'notFound'):
-        os.chmod(abbemPath, os.stat.S_IWRITE)
+        os.chmod(abbemPath, stat.S_IWUSR)
         shutil.rmtree(abbemPath)
     os.mkdir(dest)
 
@@ -257,7 +311,6 @@ def popUpWindow():
         os.mkdir(docPath)
 
     # Moove files and dirs in new directory
-    # TODO : change 'src' by 'currentPath'
     shutil.move(currentPath, dest)
 
     # TODO : change for 'if files mooved'
