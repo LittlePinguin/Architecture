@@ -10,7 +10,10 @@ import getpass
 import fileinput
 
 # TODO : - add loading bar in splash screen
-#        - 
+#        - optimize program
+#        - btn 'ok' not working more than 1 time
+#        - index out of range when Revit is rewrited (just modifying files)
+#        - installation when dir ABBem already exists have to delete old one and then move the new one
 
 # Window settings
 window = Tk()
@@ -48,6 +51,7 @@ l5.place(x=50, y=180)
 
 # Variables
 fileR = 'Revit.ini'
+filer = 'res.ini'
 selected =[]
 choice = IntVar()
 a = IntVar()
@@ -72,11 +76,11 @@ h = IntVar()
 user = getpass.getuser()
 
 # Paths
-src = os.path.join('C:\\', 'Users', getpass.getuser(), 'Downloads','ABBEM')
+src = os.path.join('C:\\', 'Users', user, 'Downloads','ABBEM')
 dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
 destCheck = os.path.join('C:\\', 'ProgramData')
-revitPath = os.path.join('C:\\', 'Users', getpass.getuser(), 'AppData', 'Roaming', 'Autodesk', 'Revit')
-pathRtmp = os.path.join('C:\\', 'Users', getpass.getuser(), 'Documents', 'Work')
+revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
+pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
 # See if have to add 'Autodesk Revit 2021' if too slow
 
 
@@ -120,11 +124,9 @@ def getLines():
         if (line.startswith("SystemsAnalysisWorkflows")):
                 sysLin = line
                 sysLin = sysLin.replace("\n", "")
-                print(sysLin)
         if (line.startswith("OpenStudio")):
             openLine = line
             openLine = openLine.replace("\n", "")
-            print(openLine)
     return sysLin
 
 def getLinesO():
@@ -138,7 +140,6 @@ def getLinesO():
         if (line.startswith("OpenStudio")):
             openLi = line
             openLi = openLi.replace("\n", "")
-            print(openLi)
     return openLi
 
 sysLine = getLines()
@@ -176,12 +177,77 @@ def closeWindow():
     window.destroy()
 
 
+# Modify file 'Revit.ini' without closing window
+def revitNoClose():
+    getInfo(selected)
+
+    # Check if user selected files
+    if len(selected) == 0:
+        # Pop up window
+        popUpEr = Toplevel(bg="dimgrey")
+        popUpEr.geometry("350x200+590+270")
+        popUpEr.overrideredirect(True)
+
+        # Label error
+        label = Label(popUpEr, text="ERREUR", fg="red", bg="dimgrey")
+        labelset = ('Calibri (Body)', 14, 'bold')
+        label.config(font=labelset)
+        label.place(x=150, y=30)
+
+        label2 = Label(popUpEr, text="Veuillez sélectionner les fichiers voulus.", bg="dimgrey")
+        label2set = ('Calibri (Body)', 10, 'normal')
+        label2.config(font=label2set)
+        label2.place(x=30, y=90)
+
+        btn = Button(popUpEr, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUpEr.destroy())
+        btn.place(x=160, y=170)
+    else:
+        # Pop up window
+        popUp = Toplevel(bg="dimgrey")
+        popUp.geometry("350x200+590+270")
+        popUp.overrideredirect(True)
+
+        # Label program over
+        label = Label(popUp, text="Programme terminé. \n Fichiers installés avec succès.", bg="dimgrey")
+        labelset = ('Calibri (Body)', 14, 'italic')
+        label.config(font=labelset)
+        label.place(x=50, y=50)
+
+        popUp.after(1000, popUp.destroy())
+    
+        # Get 'Revit.ini' path
+        # TODO : real 'Revit.ini' path = revitPath
+        path = find(fileR, pathRtmp, 2)
+
+        # Open files to read and write
+        fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
+        fileOutput =  open(os.path.join(path, filer), "w", encoding="utf-16")
+
+        # Get variable 'SystemsAnalysisWorkflows'
+        var = "SystemsAnalysisWorkflows="
+        for i in range(len(selected)):
+            var+=selected[i]
+
+        # Rewrite file 'Revit.ini'
+        for line in fileInput:
+            fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw", var))
+
+        # Close files
+        fileInput.close()
+        fileOutput.close()
+
+        # Rename files
+        if (find('original_Revit.ini', pathRtmp, 2) == 'notFound'):
+            os.rename(os.path.join(path, fileR), os.path.join(path, 'original_Revit.ini'))
+        else:
+            os.remove(os.path.join(path, fileR))
+        os.rename(os.path.join(path, filer), os.path.join(path, fileR))
+
+
 # Modify file 'Revit.ini'
 def changeRevit():
     # Get user selection
     getInfo(selected)
-
-    filer = 'res.ini'
 
     # Check if user selected files
     if len(selected) == 0:
@@ -229,10 +295,8 @@ def changeRevit():
         var = "SystemsAnalysisWorkflows="
         for i in range(len(selected)):
             var+=selected[i]
-        print(var)
 
         # Rewrite file 'Revit.ini'
-        # TODO : automatize
         for line in fileInput:
             fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw", var))
         #fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
@@ -242,8 +306,10 @@ def changeRevit():
         fileOutput.close()
 
         # Rename files
-        # TODO : rename ONLY 1st old 'Revit.ini' in 'original_Revit.ini'
-        os.rename(os.path.join(path, fileR), os.path.join(path, 'original_Revit.ini'))
+        if (find('original_Revit.ini', pathRtmp, 2) == 'notFound'):
+            os.rename(os.path.join(path, fileR), os.path.join(path, 'original_Revit.ini'))
+        else:
+            os.remove(os.path.join(path, fileR))
         os.rename(os.path.join(path, filer), os.path.join(path, fileR))
 
 
@@ -276,7 +342,7 @@ def filesFrame():
     ck8.place(x=200, y=300)
 
     # Buttons 'ok' and 'exit'
-    ok = Button(checkFrame, text = "OK", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = lambda: window.destroy())
+    ok = Button(checkFrame, text = "OK", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = revitNoClose)
     ok.place(x=260, y=350)
     ex = Button(checkFrame, text = "Exit", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = changeRevit)
     ex.place(x=500, y=390)
@@ -303,15 +369,17 @@ def popUpWindow():
     # Create new directory 'ABBem' in 'ProgramData'
     if (abbemPath != 'notFound'):
         os.chmod(abbemPath, stat.S_IWUSR)
-        shutil.rmtree(abbemPath)
-    os.mkdir(dest)
+        #shutil.rmtree(abbemPath)
+    else:
+        os.mkdir(dest)
 
     # Create new directory 'ABBem' in 'Documents'
     if (docPath == 'notFound'):
         os.mkdir(docPath)
 
     # Moove files and dirs in new directory
-    shutil.move(currentPath, dest)
+    if (abbemPath == 'notFound'):
+        shutil.move(currentPath, dest)
 
     # TODO : change for 'if files mooved'
     popUp.after(2000, lambda: (filesFrame(), popUp.destroy()))
@@ -344,6 +412,9 @@ def mooveFiles():
 
             btn = Button(popUp, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUp.destroy())
             btn.place(x=160, y=170)
+        else:
+            instFrame.pack_forget()
+            popUpWindow()
 
 
 # Frame choose 'installation' or 'only files'
