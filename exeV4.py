@@ -13,7 +13,6 @@ import fileinput
 #        - optimize program
 #        - btn 'ok' not working more than 1 time
 #        - index out of range when Revit is rewrited (just modifying files)
-#        - installation when dir ABBem already exists have to delete old one and then move the new one
 
 # Window settings
 window = Tk()
@@ -168,7 +167,7 @@ def getInfo(selected):
         selected += files[7]
 
 
-abbemPath = find('ABBem', destCheck, 1)
+abbemPath = os.path.join(find('ABBem', destCheck, 1), 'ABBem')
 
 
 # Close program
@@ -362,24 +361,22 @@ def popUpWindow():
     label.config(font=labelset)
     label.place(x=50, y=50)
 
-    docPath = os.path.join('Documents', 'ABBem')
+    docPath = os.path.join('C:\\','Users',user,'Documents','ABBem')
     
     currentPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ABBem')
 
     # Create new directory 'ABBem' in 'ProgramData'
     if (abbemPath != 'notFound'):
-        os.chmod(abbemPath, stat.S_IWUSR)
-        #shutil.rmtree(abbemPath)
-    else:
-        os.mkdir(dest)
+        #os.chmod(abbemPath, stat.S_IWUSR)
+        shutil.rmtree(abbemPath)
+    os.mkdir(dest)
 
     # Create new directory 'ABBem' in 'Documents'
     if (docPath == 'notFound'):
         os.mkdir(docPath)
 
     # Moove files and dirs in new directory
-    if (abbemPath == 'notFound'):
-        shutil.move(currentPath, dest)
+    shutil.move(currentPath, dest)
 
     # TODO : change for 'if files mooved'
     popUp.after(2000, lambda: (filesFrame(), popUp.destroy()))
