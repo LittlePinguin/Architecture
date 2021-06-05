@@ -12,7 +12,7 @@ import fileinput
 # TODO : - add loading bar in splash screen
 #        - optimize program
 #        - btn 'ok' not working more than 1 time
-#        - index out of range when Revit is rewrited (just modifying files)
+#        - automatiser checkbox files names + getInfo()
 
 # Window settings
 window = Tk()
@@ -99,6 +99,9 @@ def find(name, path, num):
 
 # Read Revit.ini and copy lines
 def getFiles():
+    if (find('original_Revit.ini', pathRtmp, 2)):
+        fileR = "original_Revit.ini"
+
     path = find(fileR, pathRtmp, 2)
 
     fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
@@ -113,7 +116,6 @@ def getFiles():
     return files
 
 def getLines():
-
     path = find(fileR, pathRtmp, 2)
 
     sysLin = ""
@@ -129,7 +131,6 @@ def getLines():
     return sysLin
 
 def getLinesO():
-
     path = find(fileR, pathRtmp, 2)
 
     openLi = ""
@@ -144,9 +145,9 @@ def getLinesO():
 sysLine = getLines()
 openLine = getLinesO()
 
-
 files = getFiles()
-openLine2 ="OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021" 
+
+
 # Get files selected in filesFrame
 def getInfo(selected):
     if (a.get() == 1):
@@ -229,7 +230,7 @@ def revitNoClose():
 
         # Rewrite file 'Revit.ini'
         for line in fileInput:
-            fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw", var))
+            fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace(sysLine, var))
 
         # Close files
         fileInput.close()
@@ -288,7 +289,7 @@ def changeRevit():
 
         # Open files to read and write
         fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
-        fileOutput =  open(os.path.join(path, filer), "w", encoding="utf-16")
+        fileOutput = open(os.path.join(path, filer), "w", encoding="utf-16")
 
         # Get variable 'SystemsAnalysisWorkflows'
         var = "SystemsAnalysisWorkflows="
@@ -297,8 +298,7 @@ def changeRevit():
 
         # Rewrite file 'Revit.ini'
         for line in fileInput:
-            fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw", var))
-        #fileOutput.write(line.replace("OpenStudio=%ProgramFiles%\\NREL\OpenStudio CLI For Revit 2021","OpenStudio=C:\\ProgramData\ABBem\OStudio").replace("SystemsAnalysisWorkflows=BuildingEnergySimulation=E:\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, AB Besoins Bioclimatiques=E:\ABBem2\AB Besoins Bioclimatiques.osw, AB Distribution Besoins=E:\ABBem2\AB Distribution Besoins.osw, AB ViewData=E:\ABBem2\AB ViewData.osw, AB EnergyPlus=E:\ABBem2\AB EnergyPlus.osw, AB Bem=E:\ABBem2\AB Bem.osw, AB ProfilsHoraires=E:\ABBem2\AB ProfilsHoraires.osw, AB Test=E:\ABBem2\AB Test.osw",var))
+            fileOutput.write(line.replace(openLine,"OpenStudio=C:\\ProgramData\ABBem\OStudio").replace(sysLine, var))
 
         # Close files
         fileInput.close()
@@ -411,7 +411,7 @@ def mooveFiles():
             btn.place(x=160, y=170)
         else:
             instFrame.pack_forget()
-            popUpWindow()
+            filesFrame()
 
 
 # Frame choose 'installation' or 'only files'
@@ -439,7 +439,6 @@ def installFrame():
     # Button frame check files
     btn = Button(instFrame, text="Suivant", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command=mooveFiles)
     btn.place(x=250, y=290)
-
 
 
 # Splash screen timer
