@@ -13,6 +13,8 @@ import fileinput
 #        - optimize program
 #        - btn 'ok' not working more than 1 time
 #        - automatiser checkbox files names + getInfo()
+#        - add logo + image
+#        - add btn 'help' link to a website
 
 # Window settings
 window = Tk()
