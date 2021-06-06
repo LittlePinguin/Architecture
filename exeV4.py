@@ -1,5 +1,7 @@
+import tkinter
 from tkinter import *
 from tkinter import ttk
+#from PIL import Image, ImageTk
 from tkinter.ttk import Progressbar
 import time
 import os
@@ -9,17 +11,17 @@ import shutil
 import getpass
 import fileinput
 
-# TODO : - add loading bar in splash screen
+# TODO : 
 #        - optimize program
-#        - btn 'ok' not working more than 1 time
-#        - automatiser checkbox files names + getInfo()
-#        - add logo + image
-#        - add btn 'help' link to a website
+#        - add logo + image to executable
+#        - handle error message when doesn't find ABBem in commplete installation
+#        - add button get original_Revit.ini back
+#        - create raccourci of exe and put in Desktop
 
 # Window settings
 window = Tk()
 window.geometry("600x450+470+150")
-window.overrideredirect(True)
+#window.overrideredirect(True)
 
 # Frames
 splashScreen = Frame(window, width=window.winfo_screenwidth(), height=window.winfo_screenheight(), bg="#249794")
@@ -28,7 +30,44 @@ splashScreen.pack()
 instFrame = Frame(window, width=window.winfo_screenwidth(), height=window.winfo_screenheight())
 checkFrame = Frame(window, width=window.winfo_screenwidth(), height=window.winfo_screenheight())
 
+
+
+# Variables
+fileR = 'Revit.ini'
+filer = 'res.ini'
+selected =[]
+choice = IntVar()
+
+# Get user name
+user = getpass.getuser()
+
+# Paths
+src = os.path.join('C:\\', 'Users', user, 'Downloads','ABBEM')
+dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
+destCheck = os.path.join('C:\\', 'ProgramData')
+revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
+#imgPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ENSAG.png')
+#logoPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Logo_ABBem_Test.png')
+pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
+
+
+# Images
+#img = Image.open(imgPath)
+#resized = img.resize((130, 100), Image.ANTIALIAS)
+#img = ImageTk.PhotoImage(resized)
+
+#logo = Image.open(logoPath)
+#resizedL = logo.resize((30, 30), Image.ANTIALIAS)
+#logo = ImageTk.PhotoImage(resizedL)
+
+
+
 # Splash screen labels
+# Logo label
+#logoLabel = Label(splashScreen, image=logo)
+#logoLabel.place(x=5, y=5)
+
+# Texts labels
 l1 = Label(splashScreen, text="ABBEM", fg="white", bg="#249794")
 lset1 = ("Calibri (Body)", 18, "bold")
 l1.config(font=lset1)
@@ -49,40 +88,9 @@ lset5 = ("Calibri (Body)", 13, "italic")
 l5.config(font=lset5)
 l5.place(x=50, y=180)
 
-
-# Variables
-fileR = 'Revit.ini'
-filer = 'res.ini'
-selected =[]
-choice = IntVar()
-a = IntVar()
-b = IntVar()
-c = IntVar()
-d = IntVar()
-e = IntVar()
-f = IntVar()
-g = IntVar()
-h = IntVar()
-#files = ["BuildingEnergySimulation=C:\\ProgramData\ABBEM\Revit_BuildingEnergyAnalysis\BuildingEnergySimulation.osw, ",
-#         "AB Besoins Bioclimatiques=C:\\ProgramData\ABBEM\AB Besoins Bioclimatiques.osw, ",
- #        "AB Distribution Besoins=C:\\ProgramData\ABBEM\AB Distribution Besoins.osw, ",
-  #       "AB ViewData=C:\\ProgramData\ABBEM\ABViewData.osw, ",
-   #      "AB EnergyPlus=C:\\ProgramData\ABBEM\AB EnergyPlus.osw, ",
-    #     "AB Bem=C:\\ProgramData\ABBEM\AB Bem.osw, ",
-     #    "AB ProfilsHoraires=C:\\ProgramData\ABBEM\AB ProfilsHoraires.osw, ",
-      #   "AB Test=C:\\ProgramData\ABBEM\AB Test.osw, "]
-
-
-# Get user name
-user = getpass.getuser()
-
-# Paths
-src = os.path.join('C:\\', 'Users', user, 'Downloads','ABBEM')
-dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
-destCheck = os.path.join('C:\\', 'ProgramData')
-revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
-pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
-# See if have to add 'Autodesk Revit 2021' if too slow
+# Image label
+#imgLabel = Label(splashScreen, image=img)
+#imgLabel.place(x=30, y=320)
 
 
 
@@ -98,13 +106,14 @@ def find(name, path, num):
                 return root
     return 'notFound'
 
-
 # Read Revit.ini and copy lines
 def getFiles():
-    if (find('original_Revit.ini', pathRtmp, 2)):
+    if (find('original_Revit.ini', revitPath, 2) != 'notFound'):
         fileR = "original_Revit.ini"
-
-    path = find(fileR, pathRtmp, 2)
+    else:
+        fileR = 'Revit.ini'
+    
+    path = find(fileR, revitPath, 2)
 
     fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
 
@@ -118,11 +127,12 @@ def getFiles():
     return files
 
 def getLines():
-    path = find(fileR, pathRtmp, 2)
+    path = find(fileR, revitPath, 2)
 
     sysLin = ""
 
     fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
+
     for line in fileInput:
         if (line.startswith("SystemsAnalysisWorkflows")):
                 sysLin = line
@@ -133,7 +143,7 @@ def getLines():
     return sysLin
 
 def getLinesO():
-    path = find(fileR, pathRtmp, 2)
+    path = find(fileR, revitPath, 2)
 
     openLi = ""
 
@@ -149,28 +159,25 @@ openLine = getLinesO()
 
 files = getFiles()
 
+# Get files names
+fileName = files.copy()
+ckVar = {}
+for i in range (len(fileName)):
+    elmt = fileName[i]
+    elmt = elmt.rsplit('\\', 1)
+    fileName[i] = elmt[1]    
+    ckVar[i] = tkinter.IntVar()
 
 # Get files selected in filesFrame
 def getInfo(selected):
-    if (a.get() == 1):
-        selected += files[0]
-    if (b.get() == 1):
-        selected += files[1]
-    if (c.get() == 1):
-        selected += files[2]
-    if (d.get() == 1):
-        selected += files[3]
-    if (e.get() == 1):
-        selected += files[4]
-    if (f.get() == 1):
-        selected += files[5]
-    if (g.get() == 1):
-        selected += files[6]
-    if (h.get() == 1):
-        selected += files[7]
+    for i in range(len(fileName)):
+        if (ckVar[i].get() == 1):
+            selected+=(files[i]+', ')
 
-
-abbemPath = os.path.join(find('ABBem', destCheck, 1), 'ABBem')
+if (find('ABBem', destCheck, 1)!='notFound'):
+    abbemPath = os.path.join(find('ABBem', destCheck, 1), 'ABBem')
+else:
+    abbemPath = -1
 
 
 # Close program
@@ -194,16 +201,18 @@ def revitNoClose():
         label = Label(popUpEr, text="ERREUR", fg="red", bg="dimgrey")
         labelset = ('Calibri (Body)', 14, 'bold')
         label.config(font=labelset)
-        label.place(x=150, y=30)
+        label.place(x=130, y=30)
 
         label2 = Label(popUpEr, text="Veuillez sélectionner les fichiers voulus.", bg="dimgrey")
-        label2set = ('Calibri (Body)', 10, 'normal')
+        label2set = ('Calibri (Body)', 12, 'italic')
         label2.config(font=label2set)
-        label2.place(x=30, y=90)
+        label2.place(x=35, y=80)
 
         btn = Button(popUpEr, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUpEr.destroy())
-        btn.place(x=160, y=170)
+        btn.place(x=140, y=150)
     else:
+        selected.pop()
+        selected.pop()
         # Pop up window
         popUp = Toplevel(bg="dimgrey")
         popUp.geometry("350x200+590+270")
@@ -211,15 +220,15 @@ def revitNoClose():
 
         # Label program over
         label = Label(popUp, text="Programme terminé. \n Fichiers installés avec succès.", bg="dimgrey")
-        labelset = ('Calibri (Body)', 14, 'italic')
+        labelset = ('Calibri (Body)', 12, 'italic')
         label.config(font=labelset)
-        label.place(x=50, y=50)
+        label.place(x=40, y=70)
 
-        popUp.after(1000, popUp.destroy())
+        popUp.after(1300, popUp.destroy())
     
         # Get 'Revit.ini' path
         # TODO : real 'Revit.ini' path = revitPath
-        path = find(fileR, pathRtmp, 2)
+        path = find(fileR, revitPath, 2)
 
         # Open files to read and write
         fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
@@ -239,7 +248,7 @@ def revitNoClose():
         fileOutput.close()
 
         # Rename files
-        if (find('original_Revit.ini', pathRtmp, 2) == 'notFound'):
+        if (find('original_Revit.ini', revitPath, 2) == 'notFound'):
             os.rename(os.path.join(path, fileR), os.path.join(path, 'original_Revit.ini'))
         else:
             os.remove(os.path.join(path, fileR))
@@ -262,16 +271,18 @@ def changeRevit():
         label = Label(popUpEr, text="ERREUR", fg="red", bg="dimgrey")
         labelset = ('Calibri (Body)', 14, 'bold')
         label.config(font=labelset)
-        label.place(x=150, y=30)
+        label.place(x=130, y=30)
 
         label2 = Label(popUpEr, text="Veuillez sélectionner les fichiers voulus.", bg="dimgrey")
-        label2set = ('Calibri (Body)', 10, 'normal')
+        label2set = ('Calibri (Body)', 12, 'italic')
         label2.config(font=label2set)
-        label2.place(x=30, y=90)
+        label2.place(x=35, y=80)
 
         btn = Button(popUpEr, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUpEr.destroy())
-        btn.place(x=160, y=170)
+        btn.place(x=140, y=150)
     else:
+        selected.pop()
+        selected.pop()
         # Pop up window
         popUp = Toplevel(bg="dimgrey")
         popUp.geometry("350x200+590+270")
@@ -281,13 +292,13 @@ def changeRevit():
         label = Label(popUp, text="Programme terminé. \n Fichiers installés avec succès.", bg="dimgrey")
         labelset = ('Calibri (Body)', 14, 'italic')
         label.config(font=labelset)
-        label.place(x=50, y=50)
+        label.place(x=40, y=70)
 
-        popUp.after(1000, lambda: (popUp.destroy(), window.destroy()))
+        popUp.after(1300, lambda: (popUp.destroy(), window.destroy()))
     
         # Get 'Revit.ini' path
         # TODO : real 'Revit.ini' path = revitPath
-        path = find(fileR, pathRtmp, 2)
+        path = find(fileR, revitPath, 2)
 
         # Open files to read and write
         fileInput = open(os.path.join(path, fileR), "r", encoding="utf-16")
@@ -307,7 +318,7 @@ def changeRevit():
         fileOutput.close()
 
         # Rename files
-        if (find('original_Revit.ini', pathRtmp, 2) == 'notFound'):
+        if (find('original_Revit.ini', revitPath, 2) == 'notFound'):
             os.rename(os.path.join(path, fileR), os.path.join(path, 'original_Revit.ini'))
         else:
             os.remove(os.path.join(path, fileR))
@@ -318,35 +329,32 @@ def changeRevit():
 def filesFrame():
     checkFrame.pack()
 
+    # Logo label
+    #logoLabel = Label(checkFrame, image=logo)
+    #logoLabel.place(x=5, y=5)
+
     # Label instructions
     label = Label(checkFrame, text="Veuillez sélectionner les fichiers à intégrer")
     labelset = ("Calibri (Body)", 14, "bold")
     label.config(font=labelset)
     label.place(x=100, y=30)
-
+    
+    yPlace = 60
     # Checkbuttons to choose files
-    ck1 = Checkbutton(checkFrame, text = "BuildingEnergySimulation.osw", variable = a, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck1.place(x=200, y=90)
-    ck2 = Checkbutton(checkFrame, text = "AB Besoins Bioclimatiques.osw", variable = b, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck2.place(x=200, y=120)
-    ck3 = Checkbutton(checkFrame, text = "AB Distribution Besoins.osw", variable = c, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck3.place(x=200, y=150)
-    ck4 = Checkbutton(checkFrame, text = "AB ViewData.osw", variable = d, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck4.place(x=200, y=180)
-    ck5 = Checkbutton(checkFrame, text = "AB EnergyPlus.osw", variable = e, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck5.place(x=200, y=210)
-    ck6 = Checkbutton(checkFrame, text = "AB Bem.osw", variable = f, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck6.place(x=200, y=240)
-    ck7 = Checkbutton(checkFrame, text = "AB ProfilsHoraires.osw", variable = g, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck7.place(x=200, y=270)
-    ck8 = Checkbutton(checkFrame, text = "AB Test.osw", variable = h, onvalue = 1, offvalue = 0, cursor="hand2")
-    ck8.place(x=200, y=300)
+    for i in range (len(fileName)):
+        ck = Checkbutton(checkFrame, text=fileName[i], variable=ckVar[i], onvalue=1, offvalue=0, cursor="hand2")
+        yPlace+=30
+        ck.place(x=200, y=yPlace)
 
     # Buttons 'ok' and 'exit'
     ok = Button(checkFrame, text = "OK", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = revitNoClose)
     ok.place(x=260, y=350)
     ex = Button(checkFrame, text = "Exit", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = changeRevit)
     ex.place(x=500, y=390)
+
+    # Image label
+    #imgLabel = Label(checkFrame, image=img)
+    #imgLabel.place(x=30, y=320)
 
 
 # Window mooving files
@@ -361,14 +369,14 @@ def popUpWindow():
     label = Label(popUp, text="Mooving files...", bg="dimgrey")
     labelset = ('Calibri (Body)', 14, 'italic')
     label.config(font=labelset)
-    label.place(x=50, y=50)
+    label.place(x=100, y=80)
 
     docPath = os.path.join('C:\\','Users',user,'Documents','ABBem')
     
     currentPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ABBem')
 
     # Create new directory 'ABBem' in 'ProgramData'
-    if (abbemPath != 'notFound'):
+    if (abbemPath != -1):
         #os.chmod(abbemPath, stat.S_IWUSR)
         shutil.rmtree(abbemPath)
     os.mkdir(dest)
@@ -393,7 +401,7 @@ def mooveFiles():
         instFrame.pack_forget()
         popUpWindow()
     else:
-        if (abbemPath == 'notFound'):
+        if (abbemPath == -1):
             popUp = Toplevel(bg="dimgrey")
             popUp.geometry("400x250+580+230")
             popUp.overrideredirect(True)
@@ -405,9 +413,9 @@ def mooveFiles():
             label.place(x=150, y=30)
 
             label2 = Label(popUp, text="L'installation complète n'a pas été effectuée auparavent. \n Vous ne pouvez pas uniquement ajouter les fichiers.", bg="dimgrey")
-            label2set = ('Calibri (Body)', 10, 'normal')
+            label2set = ('Calibri (Body)', 11, 'italic')
             label2.config(font=label2set)
-            label2.place(x=30, y=90)
+            label2.place(x=20, y=90)
 
             btn = Button(popUp, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUp.destroy())
             btn.place(x=160, y=170)
@@ -421,6 +429,10 @@ def installFrame():
     splashScreen.pack_forget()
 
     instFrame.pack()
+
+    # Logo label
+    #logoLabel = Label(instFrame, image=logo)
+    #logoLabel.place(x=5, y=5)
 
     # Label instructions
     label = Label(instFrame, text="Veuillez choisir l'action à effectuer")
@@ -438,9 +450,13 @@ def installFrame():
     warn = Label(instFrame, text="(uniquement si l'installation complète à déjà été effectuée)", fg="red")
     warn.place(x=190, y=220)
 
-    # Button frame check files
+    # Button to frame check files
     btn = Button(instFrame, text="Suivant", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command=mooveFiles)
     btn.place(x=250, y=290)
+
+    # Image label
+    #imgLabel = Label(instFrame, image=img)
+    #imgLabel.place(x=30, y=320)
 
 
 # Splash screen timer
