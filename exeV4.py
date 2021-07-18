@@ -14,8 +14,11 @@ import os, winshell, win32com.client
 import pathlib
 
 
+
+# création du raccourci dans le bureau :
+# récuperation du chemin vers le Bureau de l'utilisateur dans la variable desktop
+# nom du raccourci = exeV4 - raccourci.lnk (l'extension du raccourci = lnk)
 desktop = winshell.desktop()
-#desktop = r"path to where you wanna put your .lnk file"
 path2 = os.path.join(desktop, 'exeV4 - raccourci.lnk')
 target = os.path.join(pathlib.Path().resolve(),'exeV4.exe')
 print("TARGET "+target)
@@ -183,13 +186,20 @@ def closeWindow():
     window.destroy()
 
 def reinitRevit():
+    # chemin vers 'original_Revit.ini' (l'ancien fichier Revit.ini avant modification)
     check = revitPath+'\original_Revit.ini'
+    # chemin vers le nouveau fichier 'Revit.ini' après modification
     toDelete = revitPath+'\Revit.ini'
+    # si 'original_Revit.ini' n'existe pas, ça veux dire que la réinitialisation a déjà été faite (car après réinitialisation, 'original_Revit.ini' est supprimé)
     if((str(os.path.exists(check)))!="True"):
+        # affichage du message 
         tkinter.messagebox.showinfo(title='réinitialisation', message='vos fichiers sont déjà réinitialisés')
     else:
+        # suppression du nouveau 'Revit.ini' modifié
         os.remove(toDelete)
+        # renommage de l'ancien 'original_Revit.ini' vers 'Revit.ini' pour restaurer l'ancienne version
         os.rename(os.path.join(revitPath, 'original_Revit.ini'), os.path.join(revitPath, 'Revit.ini'))
+        # affichage du message
         tkinter.messagebox.showinfo(title='réinitialisation', message='la réinitialisation a été effectuée ')
 
 # Fonction qui modifie Revit.ini
@@ -276,8 +286,8 @@ def helpBtn():
         label.place(x=25, y=cpt)
         cpt+=45
 
-    #explication de chaque element
-
+    # explication de chaque element
+    # il suffit de changer le contenu des append pour mettre les bonnes explications à la place
     labelExplain=[]
     labelExplain.append("explication 1 ...")
     labelExplain.append("explication 2 ...")
@@ -287,7 +297,8 @@ def helpBtn():
     labelExplain.append("explication 6 ...")
     labelExplain.append("explication 7 ...")
     labelExplain.append("explication 8 ...")
-
+    
+    #affichage des labels des explications
     cpt=30
     for i in range(len(fileName)):
         label=Label(popUpEr, text=labelExplain[i], bg="lightgrey")
@@ -295,7 +306,7 @@ def helpBtn():
         label.config(font=labelset)
         label.place(x=25, y=cpt)
         cpt+=45
-
+    # boutton OK pour fermer la fenêtre "Aide"
     btn = Button(popUpEr, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUpEr.destroy())
     btn.place(x=235, y=390)
 
