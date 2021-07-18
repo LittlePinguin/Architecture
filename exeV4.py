@@ -24,7 +24,10 @@ import pathlib
 desktop = winshell.desktop()
 #desktop = r"path to where you wanna put your .lnk file"
 path2 = os.path.join(desktop, 'exeV4 - raccourci.lnk')
-target = target = os.path.abspath(__file__)
+import pathlib
+
+target = os.path.join(pathlib.Path().resolve(),'exeV4.exe')
+print(pathlib.Path().resolve())
 shell = win32com.client.Dispatch("WScript.Shell")
 shortcut = shell.CreateShortCut(path2)
 shortcut.Targetpath = target
@@ -52,7 +55,7 @@ choice = IntVar()
 user = getpass.getuser()
 
 # Paths
-srcABBEM = os.path.dirname(os.path.abspath(__file__))
+srcABBEM = os.path.join(pathlib.Path().resolve(),'ABBEM')
 dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
 destCheck = os.path.join('C:\\', 'ProgramData')
 revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
