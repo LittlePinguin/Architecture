@@ -55,7 +55,7 @@ choice = IntVar()
 user = getpass.getuser()
 
 # Paths
-srcABBEM = os.getcwd()+"\ABBEM"
+srcABBEM = os.path.dirname(os.path.abspath(__file__))+"\ABBEM"+"\ABBEM"
 dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
 destCheck = os.path.join('C:\\', 'ProgramData')
 revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
