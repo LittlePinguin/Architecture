@@ -1,4 +1,5 @@
 import tkinter
+import tkinter.messagebox
 from tkinter import *
 from tkinter import ttk
 #from PIL import Image, ImageTk
@@ -12,11 +13,23 @@ import getpass
 import fileinput
 
 # TODO : 
-#        - optimize program
 #        - add logo + image to executable
-#        - handle error message when doesn't find ABBem in commplete installation
-#        - add button get original_Revit.ini back
-#        - create raccourci of exe and put in Desktop
+#        + handle error message when doesn't find ABBem in commplete installation 
+#        + add button get original_Revit.ini back
+#        + create raccourci of exe and put in Desktop
+#        + add help button
+
+
+
+import os, winshell, win32com.client
+desktop = winshell.desktop()
+#desktop = r"path to where you wanna put your .lnk file"
+path2 = os.path.join(desktop, 'exeV4 - raccourci.lnk')
+target = r"C:\Users\samif\Desktop\Architecture-main\exec\dist\exeV4.exe" 
+shell = win32com.client.Dispatch("WScript.Shell")
+shortcut = shell.CreateShortCut(path2)
+shortcut.Targetpath = target
+shortcut.save()
 
 # Window settings
 window = Tk()
@@ -51,6 +64,12 @@ revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk'
 pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
 
 
+if((str(os.path.exists(dest)))!="True"):
+   tkinter.messagebox.showinfo(title='dossier manquant', message='Dossier ABBem inexistant :\nC:\ProgramData\ABBem')
+
+
+
+
 # Images
 #img = Image.open(imgPath)
 #resized = img.resize((130, 100), Image.ANTIALIAS)
@@ -83,7 +102,7 @@ lset3 = ("Calibri (Body)", 13, "bold")
 l3.config(font=lset3)
 l3.place(x=70, y=110)
 
-l5 = Label(splashScreen, text="Some blabla to explain the purpose of this program", fg="white", bg="#249794")
+l5 = Label(splashScreen, text="explications", fg="white", bg="#249794")
 lset5 = ("Calibri (Body)", 13, "italic")
 l5.config(font=lset5)
 l5.place(x=50, y=180)
@@ -178,6 +197,7 @@ if (find('ABBem', destCheck, 1)!='notFound'):
     abbemPath = os.path.join(find('ABBem', destCheck, 1), 'ABBem')
 else:
     abbemPath = -1
+    
 
 
 # Close program
@@ -253,7 +273,17 @@ def revitNoClose():
         else:
             os.remove(os.path.join(path, fileR))
         os.rename(os.path.join(path, filer), os.path.join(path, fileR))
+    tkinter.messagebox.showinfo(title='ajout fichiers', message='les fichiers ont été ajoutés avec succès')
 
+def reinitRevit():
+    check = revitPath+'\original_Revit.ini'
+    toDelete = revitPath+'\Revit.ini'
+    if((str(os.path.exists(check)))!="True"):
+        tkinter.messagebox.showinfo(title='réinitialisation', message='vos fichiers sont déjà réinitialisés')
+    else:
+        os.remove(toDelete)
+        os.rename(os.path.join(revitPath, 'original_Revit.ini'), os.path.join(revitPath, 'Revit.ini'))
+        tkinter.messagebox.showinfo(title='réinitialisation', message='la réinitialisation a été effectuée ')
 
 # Modify file 'Revit.ini'
 def changeRevit():
@@ -324,6 +354,49 @@ def changeRevit():
             os.remove(os.path.join(path, fileR))
         os.rename(os.path.join(path, filer), os.path.join(path, fileR))
 
+def helpBtn():
+
+    # Pop up window
+    popUpEr = Toplevel(bg="lightgrey", borderwidth="2")
+    popUpEr.geometry("560x420+500+180")
+    popUpEr.overrideredirect(True)
+    cpt = 10
+    for i in range(len(fileName)):
+        label=Label(popUpEr, text="- "+fileName[i], bg="lightgrey")
+        labelset = ('Calibri (Body)', 10, 'bold')
+        label.config(font=labelset)
+        label.place(x=25, y=cpt)
+        cpt+=45
+   
+
+
+
+    #explication de chaque element
+
+    labelExplain=[]
+    labelExplain.append("explication 1 ...")
+    labelExplain.append("explication 2 ...")
+    labelExplain.append("explication 3 ...")
+    labelExplain.append("explication 4 ...")
+    labelExplain.append("explication 5 ...")
+    labelExplain.append("explication 6 ...")
+    labelExplain.append("explication 7 ...")
+    labelExplain.append("explication 8 ...")
+
+    cpt=30
+    for i in range(len(fileName)):
+        label=Label(popUpEr, text=labelExplain[i], bg="lightgrey")
+        labelset = ('Calibri (Body)', 10)
+        label.config(font=labelset)
+        label.place(x=25, y=cpt)
+        cpt+=45
+
+
+
+
+    btn = Button(popUpEr, text="OK", width=10, bg="lightgray", activebackground="white", relief=GROOVE, cursor="hand2", command= lambda: popUpEr.destroy())
+    btn.place(x=235, y=390)
+
 
 # Frame choose files
 def filesFrame():
@@ -351,7 +424,11 @@ def filesFrame():
     ok.place(x=260, y=350)
     ex = Button(checkFrame, text = "Exit", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = changeRevit)
     ex.place(x=500, y=390)
-
+    reinit = Button(checkFrame, text = "Réinitialiser", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = reinitRevit)
+    reinit.place(x=25, y=390)
+    help = Button(checkFrame, text = "Aide", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = helpBtn)
+    help.place(x=25, y=70)
+ 
     # Image label
     #imgLabel = Label(checkFrame, image=img)
     #imgLabel.place(x=30, y=320)
