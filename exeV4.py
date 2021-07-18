@@ -2,7 +2,6 @@ import tkinter
 import tkinter.messagebox
 from tkinter import *
 from tkinter import ttk
-#from PIL import Image, ImageTk
 from tkinter.ttk import Progressbar
 import time
 import os
@@ -13,7 +12,6 @@ import getpass
 import fileinput
 
 # TODO : 
-#        - add logo + image to executable
 #        + handle error message when doesn't find ABBem in commplete installation 
 #        + add button get original_Revit.ini back
 #        + create raccourci of exe and put in Desktop
@@ -35,7 +33,6 @@ shortcut.save()
 # Window settings
 window = Tk()
 window.geometry("600x450+470+150")
-#window.overrideredirect(True)
 
 # Frames
 splashScreen = Frame(window, width=window.winfo_screenwidth(), height=window.winfo_screenheight(), bg="#249794")
@@ -43,7 +40,6 @@ splashScreen.pack()
 
 instFrame = Frame(window, width=window.winfo_screenwidth(), height=window.winfo_screenheight())
 checkFrame = Frame(window, width=window.winfo_screenwidth(), height=window.winfo_screenheight())
-
 
 
 # Variables
@@ -56,36 +52,19 @@ choice = IntVar()
 user = getpass.getuser()
 
 # Paths
-srcABBEM = os.path.join(os.path.dirname(os.path.abspath(__file__)),"ABBEM")
+srcABBEM = os.path.dirname(os.path.abspath(__file__))
 dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
 destCheck = os.path.join('C:\\', 'ProgramData')
 revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
-#imgPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ENSAG.png')
-#logoPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Logo_ABBem_Test.png')
 pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
 
-
-if((str(os.path.exists(srcABBEM)))!="True"):
-   tkinter.messagebox.showinfo(title='dossier manquant', message="Dossier ABBem inexistant, \nABBem doit être dans le même répertoire que l'exécutable.")
+if(str(os.path.exists(srcABBEM))=='False'):
+   tkinter.messagebox.showinfo(title='Dossier manquant', message="Dossier ABBem inexistant, \nABBem doit être dans le même répertoire que l'exécutable.")
    window.destroy()
    sys.exit()
 
 
-# Images
-#img = Image.open(imgPath)
-#resized = img.resize((130, 100), Image.ANTIALIAS)
-#img = ImageTk.PhotoImage(resized)
-
-#logo = Image.open(logoPath)
-#resizedL = logo.resize((30, 30), Image.ANTIALIAS)
-#logo = ImageTk.PhotoImage(resizedL)
-
-
-
 # Splash screen labels
-# Logo label
-#logoLabel = Label(splashScreen, image=logo)
-#logoLabel.place(x=5, y=5)
 
 # Texts labels
 l1 = Label(splashScreen, text="ABBEM", fg="white", bg="#249794")
@@ -107,11 +86,6 @@ l5 = Label(splashScreen, text="explications", fg="white", bg="#249794")
 lset5 = ("Calibri (Body)", 13, "italic")
 l5.config(font=lset5)
 l5.place(x=50, y=180)
-
-# Image label
-#imgLabel = Label(splashScreen, image=img)
-#imgLabel.place(x=30, y=320)
-
 
 
 # Find a file or a directory
@@ -403,17 +377,13 @@ def helpBtn():
 def filesFrame():
     checkFrame.pack()
 
-    # Logo label
-    #logoLabel = Label(checkFrame, image=logo)
-    #logoLabel.place(x=5, y=5)
-
     # Label instructions
     label = Label(checkFrame, text="Veuillez sélectionner les fichiers à intégrer")
     labelset = ("Calibri (Body)", 14, "bold")
     label.config(font=labelset)
     label.place(x=100, y=30)
-    
     yPlace = 60
+
     # Checkbuttons to choose files
     for i in range (len(fileName)):
         ck = Checkbutton(checkFrame, text=fileName[i], variable=ckVar[i], onvalue=1, offvalue=0, cursor="hand2")
@@ -422,16 +392,11 @@ def filesFrame():
 
     # Buttons 'ok' and 'exit'
     ex = Button(checkFrame, text = "OK et Quitter", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = changeRevit)
-    ex.place(x=500, y=390)
-    reinit = Button(checkFrame, text = "Réinitialiser", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = reinitRevit)
+    ex.place(x=240, y=350)
+    reinit = Button(checkFrame, text = "Réinitialiser Revit", width=15, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = reinitRevit)
     reinit.place(x=25, y=390)
     help = Button(checkFrame, text = "Aide", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = helpBtn)
     help.place(x=25, y=70)
- 
-    # Image label
-    #imgLabel = Label(checkFrame, image=img)
-    #imgLabel.place(x=30, y=320)
-
 
 # Window mooving files
 def popUpWindow():
@@ -449,11 +414,10 @@ def popUpWindow():
 
     docPath = os.path.join('C:\\','Users',user,'Documents','ABBem')
     
-    currentPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ABBem')
+    currentPath = os.path.dirname(os.path.abspath(__file__))
 
     # Create new directory 'ABBem' in 'ProgramData'
     if (abbemPath != -1):
-        #os.chmod(abbemPath, stat.S_IWUSR)
         shutil.rmtree(abbemPath)
     os.mkdir(dest)
 
@@ -464,7 +428,6 @@ def popUpWindow():
     # Moove files and dirs in new directory
     shutil.move(currentPath, dest)
 
-    # TODO : change for 'if files mooved'
     popUp.after(2000, lambda: (filesFrame(), popUp.destroy()))
 
 
