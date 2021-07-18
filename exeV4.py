@@ -417,7 +417,7 @@ def popUpWindow():
 
     docPath = os.path.join('C:\\','Users',user,'Documents','ABBem')
     
-    currentPath = pathlib.Path().resolve()
+    currentPath = os.path.join(pathlib.Path().resolve(),'ABBEM')
 
     # Create new directory 'ABBem' in 'ProgramData'
     if (abbemPath != -1):
