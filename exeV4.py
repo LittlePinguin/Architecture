@@ -55,7 +55,7 @@ choice = IntVar()
 user = getpass.getuser()
 
 # Paths
-src = os.path.join('C:\\', 'Users', user, 'Downloads','ABBEM')
+srcABBEM = os.getcwd()+"\ABBEM"
 dest = os.path.join('C:\\', 'ProgramData', 'ABBem')
 destCheck = os.path.join('C:\\', 'ProgramData')
 revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk', 'Revit')
@@ -64,8 +64,8 @@ revitPath = os.path.join('C:\\', 'Users', user, 'AppData', 'Roaming', 'Autodesk'
 pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
 
 
-if((str(os.path.exists(dest)))!="True"):
-   tkinter.messagebox.showinfo(title='dossier manquant', message='Dossier ABBem inexistant :\nC:\ProgramData\ABBem')
+if((str(os.path.exists(srcABBEM)))!="True"):
+   tkinter.messagebox.showinfo(title='dossier manquant', message="Dossier ABBem inexistant, \nABBem doit être dans le même répertoire que l'executable")
 
 
 
@@ -522,6 +522,7 @@ def installFrame():
     r1.place(x=170, y=150)
     r2 = Radiobutton(instFrame, text = "Ajout des fichiers", variable = choice, value = 1, cursor="hand2")
     r2.place(x=170, y=200)
+
 
     # Label mention under 2nd radio btn
     warn = Label(instFrame, text="(uniquement si l'installation complète à déjà été effectuée)", fg="red")
