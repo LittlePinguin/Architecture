@@ -22,10 +22,11 @@ import fileinput
 
 
 import os, winshell, win32com.client
+import pathlib
 desktop = winshell.desktop()
 #desktop = r"path to where you wanna put your .lnk file"
 path2 = os.path.join(desktop, 'exeV4 - raccourci.lnk')
-target = os.path.abspath(__file__)
+target = target = os.path.abspath(__file__)
 shell = win32com.client.Dispatch("WScript.Shell")
 shortcut = shell.CreateShortCut(path2)
 shortcut.Targetpath = target
@@ -65,9 +66,9 @@ pathRtmp = os.path.join('C:\\', 'Users', user, 'Documents', 'Work')
 
 
 if((str(os.path.exists(srcABBEM)))!="True"):
-   tkinter.messagebox.showinfo(title='dossier manquant', message="Dossier ABBem inexistant, \nABBem doit être dans le même répertoire que l'executable")
-
-
+   tkinter.messagebox.showinfo(title='dossier manquant', message="Dossier ABBem inexistant, \nABBem doit être dans le même répertoire que l'exécutable.")
+   window.destroy()
+   sys.exit()
 
 
 # Images
@@ -420,9 +421,7 @@ def filesFrame():
         ck.place(x=200, y=yPlace)
 
     # Buttons 'ok' and 'exit'
-    ok = Button(checkFrame, text = "OK", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = revitNoClose)
-    ok.place(x=260, y=350)
-    ex = Button(checkFrame, text = "Exit", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = changeRevit)
+    ex = Button(checkFrame, text = "OK et Quitter", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = changeRevit)
     ex.place(x=500, y=390)
     reinit = Button(checkFrame, text = "Réinitialiser", width=10, bg="lightgray", activebackground="white", cursor="hand2", relief=GROOVE, command = reinitRevit)
     reinit.place(x=25, y=390)
