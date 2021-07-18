@@ -25,7 +25,7 @@ import os, winshell, win32com.client
 desktop = winshell.desktop()
 #desktop = r"path to where you wanna put your .lnk file"
 path2 = os.path.join(desktop, 'exeV4 - raccourci.lnk')
-target = r"C:\Users\samif\Desktop\Architecture-main\exec\dist\exeV4.exe" 
+target = os.getcwd()+"\exeV4.exe"
 shell = win32com.client.Dispatch("WScript.Shell")
 shortcut = shell.CreateShortCut(path2)
 shortcut.Targetpath = target
